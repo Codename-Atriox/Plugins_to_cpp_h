@@ -278,7 +278,7 @@ namespace Plugins_to_cpp_h
                    }break;
                 case 57:{ 
                     string referenced_struct = param.Attributes?["GUID"]?.Value;
-                    string struct_count = param.Attributes?["Count"]?.Value;
+                    string struct_count = param.Attributes?["Count"]?.Value; // the question is, is this in hex or decimal??? // decimal.
                     XmlNode next_struct = root_node.SelectSingleNode("_"+referenced_struct);
                     string next_struct_name = filter_string(next_struct.Attributes?["Name"]?.Value);
                     lines.Add("   " + next_struct_name + " " + param_name + "["+ struct_count + "];");
