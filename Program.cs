@@ -18,7 +18,7 @@ using System.Xml;
 namespace Plugins_to_cpp_h
 {
     internal class Program{
-        const string version = "0.4.1";
+        const string version = "0.4.3";
 
         static XmlNode root_node;
         static StreamWriter file;
@@ -83,27 +83,30 @@ namespace Plugins_to_cpp_h
             file.WriteLine("; GENERATED TIMESTAMP: " + DateTime.Today.Date.ToString("dd/MM/yyyy") + " -> " + DateTime.Now.ToString("h:mm:ss tt"));
             file.WriteLine("*/");
             file.WriteLine("");
+            file.WriteLine("#pragma once");
             file.WriteLine("#include \"commons.h\"");
             file.WriteLine("#pragma pack(push, 1)");
             file.WriteLine("");
+            file.WriteLine("namespace " + plugin_name + " {");
             structs_queue.Add(root_node.ChildNodes[0]); // assume the first struct is the root struct
             for (int i = 0; i < structs_queue.Count; i++) process_node(structs_queue[i]);
             file.WriteLine("");
             file.WriteLine("// /////////////// //");
             file.WriteLine("// FLAG REFERENCES //");
-            file.WriteLine("// /////////////// //\n");
+            file.WriteLine("// /////////////// //");
             for (int i = 0; i < flags_queue.Count; i++) process_flag(flags_queue[i]);
             file.WriteLine("");
             file.WriteLine("// /////////////// //");
             file.WriteLine("// ENUM REFERENCES //");
-            file.WriteLine("// /////////////// //\n");
+            file.WriteLine("// /////////////// //");
             for (int i = 0; i < enums_queue.Count; i++) process_enum(enums_queue[i]);
             file.WriteLine("// ///////////////// //");
             file.WriteLine("// STRUCT REFERENCES //");
-            file.WriteLine("// ///////////////// //\n");
+            file.WriteLine("// ///////////////// //");
             // now we actually write the struct, and we do it in the inverse order that we found them in, hopefully to fix all errors
             for (int i = struct_lines.Count-1; i >= 0; i--) for (int c = 0; c < struct_lines[i].Count; c++) file.WriteLine(struct_lines[i][c]);
 
+            file.WriteLine("}");
             file.WriteLine("#pragma pack(pop)");
             file.Close();
             file.Dispose();
@@ -170,7 +173,7 @@ namespace Plugins_to_cpp_h
             else if (current_param.Name == "_B") class_type = "uint16_t";
             else if (current_param.Name == "_C") class_type = "uint32_t";
             // idk how to assign the size of an enum, o we'll have t ocome abck to that one
-            file.WriteLine("enum " + target_node + " : " + class_type + " {");
+            file.WriteLine("enum class " + target_node + " : " + class_type + " {");
             for(int i = 0; i < current_param.ChildNodes.Count; i++){
                 XmlNode current = current_param.ChildNodes[i];
                 file.WriteLine("   " + filter_string(current.Attributes?["n"]?.Value) + " = " + i +",");
